@@ -1,17 +1,19 @@
 workflows:
   version: 2
-  tests:
+  PHPUnit-PHP54:
     jobs:
-    #- php54-wp51-build
-    #- php54-wp50-build
-    #- php54-wp49-build
-    #- php54-wp48-build
-    #- php54-wp47-build
-    #- php55-wp51-build
-    #- php55-wp50-build
-    #- php55-wp49-build
-    #- php55-wp48-build
-    #- php55-wp47-build
+    - php54-wp51-build
+    - php54-wp50-build
+    - php54-wp49-build
+    - php54-wp48-build
+    - php54-wp47-build
+  PHPUnit-PHP55:
+    jobs:
+    - php55-wp51-build
+    - php55-wp50-build
+    - php55-wp49-build
+    - php55-wp48-build
+    - php55-wp47-build
     #- php56-wp-latest-build
     #- php56-wp51-build
     #- php56-wp50-build
@@ -36,8 +38,10 @@ workflows:
     #- php72-wp49-build
     #- php72-wp48-build
     #- php72-wp47-build
-    #- php-js-lints
-    - qunit
+  PHP-JS-Lints:
+    jobs:
+    - php-js-lints
+    #- qunit
 
 version: 2
 
@@ -372,7 +376,6 @@ jobs:
         path: ~/junit
     - store_artifacts:
         path: ~/junit
-
 
   qunit:
     docker:
