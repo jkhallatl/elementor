@@ -1,42 +1,57 @@
 workflows:
   version: 2
-  tests:
+  PHP-JS-Lints:
+    jobs:
+      - php-js-lints
+  JS-Qunit:
+    jobs:
+      - js-qunit
+  PHPUnit-PHP5.4:
     jobs:
     - php54-wp51-build
     - php54-wp50-build
     - php54-wp49-build
     - php54-wp48-build
     - php54-wp47-build
+  PHPUnit-PHP5.5:
+    jobs:
     - php55-wp51-build
     - php55-wp50-build
     - php55-wp49-build
     - php55-wp48-build
     - php55-wp47-build
+  PHPUnit-PHP5.6:
+    jobs:
     - php56-wp-latest-build
     - php56-wp51-build
     - php56-wp50-build
     - php56-wp49-build
     - php56-wp48-build
     - php56-wp47-build
+  PHPUnit-PHP7.0:
+    jobs:
     - php70-wp-latest-build
     - php70-wp51-build
     - php70-wp50-build
     - php70-wp49-build
     - php70-wp48-build
     - php70-wp47-build
+  PHPUnit-PHP7.1:
+    jobs:
     - php71-wp-latest-build
     - php71-wp51-build
     - php71-wp50-build
     - php71-wp49-build
     - php71-wp48-build
     - php71-wp47-build
+  PHPUnit-PHP7.2:
+    jobs:
     - php72-wp-latest-build
     - php72-wp51-build
     - php72-wp50-build
     - php72-wp49-build
     - php72-wp48-build
     - php72-wp47-build
-    - php-js-lints
 
 version: 2
 
@@ -353,21 +368,43 @@ jobs:
 
   php-js-lints:
     docker:
-    - image: pojome/php-js-lints
+      - image: pojome/php-js-lints
     steps:
-    - checkout
-    - run:
-        name: "Run JS lint"
-        command: |
-          mkdir -p /root/junit
-          eslint . -f junit > /root/junit/eslint.xml
-    - run:
-        name: "Run PHP lint"
-        command: |
-          export PATH=$HOME/.composer/vendor/bin:$PATH
-          phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
-          phpcs -p -s -n . --standard=./ruleset.xml --extensions=php --report=gitblame --report-junit=/root/junit/phpcs.xml
-    - store_test_results:
-        path: ~/junit
-    - store_artifacts:
-        path: ~/junit
+      - checkout
+      - run:
+          name: "Run JS lint"
+          command: |
+            mkdir -p /root/junit
+            eslint . -f junit > /root/junit/eslint.xml
+      - run:
+          name: "Run PHP lint"
+          command: |
+            export PATH=$HOME/.composer/vendor/bin:$PATH
+            phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+            phpcs -p -s -n . --standard=./ruleset.xml --extensions=php --report=gitblame --report-junit=/root/junit/phpcs.xml
+      - store_test_results:
+          path: ~/junit
+      - store_artifacts:
+          path: ~/junit
+  js-qunit:
+    docker:
+      - image: circleci/node:latest-browsers
+    steps:
+      - checkout
+      - run:
+          name: "Install Grunt"
+          command: |
+            sudo npm install -g grunt-cli
+      - run:
+          name: "NPM Install"
+          command: |
+            cd ~/project
+            npm install
+      - run:
+          name: "Grunt Scripts"
+          command: |
+            grunt scripts
+      - run:
+          name: "Run Qunit"
+          command: |
+            grunt qunit
